@@ -1,0 +1,54 @@
+#pragma once
+
+#include <cclog/cclog.h>
+
+template<class T>
+class scoped_ref {
+  public:
+    explicit scoped_ref(T* o = 0)
+        : _o(o) {
+    }
+
+    ~scoped_ref() {
+        if (_o != 0) _o->unref();
+    }
+
+    T* get() const {
+        return _o;
+    }
+
+    T* release() {
+        T* o = _o;
+        _o = 0;
+        return o;
+    }
+
+    void reset(T* o = 0) {
+        if (_o != 0) _o->unref();
+        _o = o;
+    }
+
+    T* operator->() const {
+        DCHECK(_o != 0);
+        return _o;
+    }
+
+    T& operator*() const {
+        DCHECK(_o != 0);
+        return *_o;
+    }
+
+    bool operator==(T* o) const {
+        return _o == o;
+    }
+
+    bool operator!=(T* o) const {
+        return _o != o;
+    }
+
+  private:
+    T* _o;
+
+    scoped_ref(const scoped_ref&);
+    void operator=(const scoped_ref&);
+};
